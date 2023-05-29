@@ -8,6 +8,7 @@ from questionary import select
 from bs4 import BeautifulSoup as bs4
 from .tools import prompt_tema,create_progress
 from .dosyalar import DosyaManager
+from .static import Degerler
 
 desteklenen_players = [
     "SIBNET",
@@ -137,8 +138,8 @@ def url_getir(bolum,driver,manualsub=False):
     """
     dosya, url = DosyaManager(), False
     key = base64.b64decode(
-            dosya.ayar.get("TurkAnime","key")
-        ).decode() if dosya.ayar.has_option("TurkAnime","key") else False
+            dosya.ayar.get(Degerler.HEAD,Degerler.KEY)
+        ).decode() if dosya.ayar.has_option(Degerler.HEAD,Degerler.KEY) else False
 
     with create_progress(transient=True) as progress:
         task = progress.add_task("[cyan]Bölüm sayfası getiriliyor..", start=False)
@@ -185,7 +186,7 @@ def url_getir(bolum,driver,manualsub=False):
                     key = refresh_key(driver)
                     url = decrypt_cipher(driver,cipher,key)
                     dosya.ayar.set(
-                        'TurkAnime','key',
+                        Degerler.HEAD,Degerler.KEY,
                         base64.b64encode(bytes(key,"utf_8")).decode()
                     )
                     dosya.save_ayarlar()

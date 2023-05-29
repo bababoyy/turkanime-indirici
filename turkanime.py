@@ -16,7 +16,8 @@ from turkanime_api import (
     webdriver_hazirla,
     prompt_tema,
     clear,
-    create_progress
+    create_progress,
+    Degerler
 )
 
 dosya = DosyaManager()
@@ -107,7 +108,7 @@ while True:
                 anime.oynat()
             else:
                 dosya = DosyaManager()
-                max_dl = dosya.ayar.getint("TurkAnime","aynı anda indirme sayısı")
+                max_dl = dosya.ayar.getint(Degerler.HEAD,Degerler.INDIRME_SAYISI)
                 if max_dl <= 1:
                     anime.indir()
                 else:
@@ -120,10 +121,10 @@ while True:
         ayar = dosya.ayar
         tr = lambda x: "AÇIK" if x else "KAPALI"
         while True:
-            _otosub  = ayar.getboolean("TurkAnime","manuel fansub")
-            _watched = ayar.getboolean("TurkAnime","izlendi ikonu")
-            _otosave = ayar.getboolean("TurkAnime","izlerken kaydet")
-            _max_dl  = ayar.get("TurkAnime","aynı anda indirme sayısı")
+            _otosub  = ayar.getboolean(Degerler.HEAD,Degerler.MANUEL_FANSUB)
+            _watched = ayar.getboolean(Degerler.HEAD,Degerler.IZLENDI_IKON)
+            _otosave = ayar.getboolean(Degerler.HEAD,Degerler.IZLERKEN_KAYDET)
+            _max_dl  = ayar.get(Degerler.HEAD,Degerler.INDIRME_SAYISI)
             ayarlar = [
                 'İndirilenler klasörünü seç',
                 f'İzlerken kaydet: {tr(_otosave)}',
@@ -143,18 +144,21 @@ while True:
                 from easygui import diropenbox
                 indirilenler_dizin=diropenbox()
                 if indirilenler_dizin:
-                    ayar.set('TurkAnime','indirilenler',indirilenler_dizin)
+                    ayar.set(Degerler.HEAD,Degerler.INDIRILEN_DIR,indirilenler_dizin)
 
             elif cevap == ayarlar[1]:
-                ayar.set('TurkAnime','izlerken kaydet',str(not _otosave))
+                ayar.set(Degerler.HEAD,Degerler.IZLERKEN_KAYDET,str(not _otosave))
+                _otosave = not _otosave
                 if not path.isdir(path.join(".","Kayıtlar")):
                     mkdir(path.join(".","Kayıtlar"))
 
             elif cevap == ayarlar[2]:
-                ayar.set('TurkAnime','manuel fansub',str(not _otosub))
+                ayar.set(Degerler.HEAD,Degerler.MANUEL_FANSUB,str(not _otosub))
+                _otosub = not _otosub
 
             elif cevap == ayarlar[3]:
-                ayar.set('TurkAnime','izlendi ikonu',str(not _watched))
+                ayar.set(Degerler.HEAD,Degerler.IZLENDI_IKON,str(not _watched))
+                _watched = not _watched
 
             elif cevap == ayarlar[4]:
                 _max_dl = text(
@@ -162,11 +166,10 @@ while True:
                     default = str(_max_dl),
                     style = prompt_tema
                 ).ask(kbi_msg="")
-                ayar.set('TurkAnime','aynı anda indirme sayısı',_max_dl)
-
+                ayar.set(Degerler.HEAD,Degerler.INDIRME_SAYISI,_max_dl)
             else:
+                dosya.save_ayarlar()
                 break
-            dosya.save_ayarlar()
             sorgu.son_bolum=None
 
     elif "Kapat" in islem:

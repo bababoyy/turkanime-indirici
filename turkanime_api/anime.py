@@ -10,6 +10,7 @@ from rich import print as rprint
 from .players import url_getir
 from .dosyalar import DosyaManager
 from .tools import create_progress
+from .static import Degerler
 
 class AnimeSorgula():
     """ İstenilen bölümü veya bölümleri dict olarak getir. """
@@ -63,7 +64,7 @@ class AnimeSorgula():
     def mark_bolumler(self,slug,bolumler,islem):
         """ İzlenen bölümlere tick koyar. """
         self.dosya.tazele()
-        if not self.dosya.ayar.getboolean("TurkAnime","izlendi ikonu"):
+        if not self.dosya.ayar.getboolean(Degerler.HEAD, Degerler.IZLENDI_IKON):
             return
         is_watched = lambda ep: slug in gecmis[islem] and ep in gecmis[islem][slug]
         with open(self.dosya.gecmis_path) as f:
@@ -82,12 +83,12 @@ class Anime():
         self.seri = seri
         self.bolumler = bolumler
         self.dosya = DosyaManager()
-        self.otosub = self.dosya.ayar.getboolean("TurkAnime","manuel fansub")
+        self.otosub = self.dosya.ayar.getboolean(Degerler.HEAD, Degerler.MANUEL_FANSUB)
         environ["PATH"] += ";" if name=="nt" else ":" + self.dosya.ROOT
 
     def indir(self):
         self.dosya.tazele()
-        dlfolder = self.dosya.ayar.get("TurkAnime","indirilenler")
+        dlfolder = self.dosya.ayar.get(Degerler.HEAD, Degerler.INDIRILEN_DIR)
 
         if not path.isdir(path.join(dlfolder,self.seri)):
             mkdir(path.join(dlfolder,self.seri))
@@ -108,7 +109,7 @@ class Anime():
 
     def multi_indir(self, worker_count = 2):
         self.dosya.tazele()
-        dlfolder = self.dosya.ayar.get("TurkAnime","indirilenler")
+        dlfolder = self.dosya.ayar.get(Degerler.HEAD,Degerler.INDIRILEN_DIR)
 
         if not path.isdir(path.join(dlfolder,self.seri)):
             mkdir(path.join(dlfolder,self.seri))
@@ -182,7 +183,7 @@ class Anime():
 
         suffix ="--referrer=https://video.sibnet.ru/ " if  "sibnet" in url else ""
         suffix+= "--msg-level=display-tags=no "
-        if self.dosya.ayar.getboolean("TurkAnime","izlerken kaydet"):
+        if self.dosya.ayar.getboolean(Degerler.HEAD, Degerler.IZLERKEN_KAYDET):
             output = path.join(self.dosya.ROOT,"Kayıtlar",self.bolumler)
             suffix+=f"--stream-record={output}.mp4 "
         system(f'mpv "{url}" {suffix} ')

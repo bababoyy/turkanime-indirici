@@ -26,6 +26,8 @@ from rich.progress import (
     TransferSpeedColumn,TimeRemainingColumn
 )
 
+from .static import Degerler
+
 class DosyaManager():
     """ Yazılımın konfigürasyon ve indirilenler klasörünü yönet
     - Windows'ta varsayılan dizin: Belgelerim/TurkAnimu
@@ -39,11 +41,11 @@ class DosyaManager():
 
         # default ayarlar
         self.default = {
-            "manuel fansub" : "False",
-            "izlerken kaydet" : "False",
-            "indirilenler" : ".",
-            "izlendi ikonu" : "True",
-            "aynı anda indirme sayısı" : "3",
+            Degerler.MANUEL_FANSUB : "False",
+            Degerler.IZLERKEN_KAYDET : "False",
+            Degerler.INDIRILEN_DIR : ".",
+            Degerler.IZLENDI_IKON : "True",
+            Degerler.INDIRME_SAYISI : "3",
         }
         self.ayar_path = path.join(self.ROOT, "ayarlar.ini")
         self.gecmis_path = path.join(self.ROOT, "gecmis.json")
@@ -73,7 +75,8 @@ class DosyaManager():
                     replace(old,self.ayar_path)
 
         if not path.isfile(self.ayar_path):
-            new = "[TurkAnime]\n"
+            print("[UYARI] ayarlar.ini bulunamadı")
+            new = f"[{Degerler.HEAD}]\n"
             for key,val in self.default.items():
                 new += f"{key} = {val}\n"
             with open(self.ayar_path,"w") as f:
@@ -83,9 +86,10 @@ class DosyaManager():
             cfg = ConfigParser()
             cfg.read(self.ayar_path)
             for key,val in self.default.items():
-                if key in cfg.options("TurkAnime"):
+                if key in cfg.options(Degerler.HEAD):
                     continue
-                cfg.set('TurkAnime',key,val)
+                print(f"[UYARI] {key} bulunamadı.")
+                cfg.set(Degerler.HEAD,key,val)
             with open(self.ayar_path,"w") as f:
                 cfg.write(f)
         if not path.isfile(self.gecmis_path):

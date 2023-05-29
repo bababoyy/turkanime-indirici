@@ -18,6 +18,7 @@ from rich.progress import Progress, BarColumn, SpinnerColumn
 from questionary import confirm
 
 from .dosyalar import DosyaManager,DownloadGereksinimler
+from .static import Degerler
 
 def clear():
     """ Daha kompakt görüntü için her prompt sonrası clear
@@ -76,8 +77,8 @@ def webdriver_hazirla(progress=None):
     dosya = DosyaManager()
     options = Options()
     options.add_argument('--headless')
-    if dosya.ayar.has_option("TurkAnime","firefox konumu"):
-        options.binary_location = dosya.ayar.get("TurkAnime","firefox konumu")
+    if dosya.ayar.has_option(Degerler.HEAD, Degerler.FIREFOX_KONUMU):
+        options.binary_location = dosya.ayar.get(Degerler.HEAD, Degerler.FIREFOX_KONUMU)
     profile = webdriver.FirefoxProfile()
     profile.set_preference("dom.webdriver.enabled", False)
     profile.set_preference('useAutomationExtension', False)
@@ -100,7 +101,7 @@ def webdriver_hazirla(progress=None):
             from easygui import fileopenbox
             firefox_dizin=fileopenbox("/")
             if firefox_dizin:
-                dosya.ayar.set("TurkAnime","firefox konumu",firefox_dizin)
+                dosya.ayar.set(Degerler.HEAD,Degerler.FIREFOX_KONUMU,firefox_dizin)
                 dosya.save_ayarlar()
                 input("Programı yeniden başlatmalısınız. \n\n( Devam etmek için entera basın )")
             kapat()
