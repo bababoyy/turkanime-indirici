@@ -185,7 +185,7 @@ class Anime():
         suffix+= "--msg-level=display-tags=no "
         if self.dosya.ayar.getboolean(Degerler.HEAD, Degerler.IZLERKEN_KAYDET):
             output = path.join(self.dosya.ROOT,"Kayıtlar",self.bolumler)
-            suffix+=f"--stream-record={output}.mp4 "
+            suffix+=f"--stream-record=\"{output}.mp4\" --stream-buffer-size=536870912"
         system(f'mpv "{url}" {suffix} ')
         self.dosya.update_gecmis(self.seri,self.bolumler,islem="izlendi")
         return True
